@@ -1,11 +1,7 @@
 <?php
 
+include_once 'db.inc.php';
 
-
-namespace user;
-
-
-use PDO;
 
 class User{
 

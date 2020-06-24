@@ -1,8 +1,8 @@
 <?php
 
-use user\User;
-
 include_once 'User.php';
+include_once 'Todo.php';
+
 
 $errors = [];
 
@@ -18,5 +18,3 @@ try {
     array_push($errors, $e->getMessage());
 }
 
-
-$user = new User($db_conn);
