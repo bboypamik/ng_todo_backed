@@ -1,41 +1,37 @@
 <?php
 
-include_once 'db.inc.php';
+include_once 'Crud.php';
 
-class Todo
+class Todo extends Crud
 {
+    const _TABLE = 'todos';
 
-    private $db;
-
-    public function __construct($db_conn)
+    public function __construct()
     {
-        $this->db = $db_conn;
+        parent::__construct();
     }
 
-   public function get($id) {
-       $sql = "SELECT * FROM todos WHERE todos.user_id = $id";
-       $result = $this->db->prepare($sql);
-       $result->execute();
+    public function getAll($id)
+    {
 
-       $data = $result->fetchAll(PDO::FETCH_ASSOC);
+        return parent::read('*', self::_TABLE, 'user_id = ' . $id);
 
-       echo json_encode($data);
-   }
+    }
 
-   public function add($user_id, $item, $date){
-       $sql = "INSERT INTO todos (user_id, todo_item, date_time) VALUES ('$user_id', '$item', '$date')";
-       $result = $this->db->prepare($sql);
-       if($result->execute()){
-           $id = $this->db->lastInsertId();
-       }
-       echo json_encode($id);
-   }
+    public function addNewItem($data)
+    {
 
-   public function delete($id){
-       $sql = "DELETE FROM todos WHERE id = $id";
-       $result = $this->db->prepare($sql);
-       $result->execute();
+        $date = date("Y-m-d", strtotime(substr($data['date_time'], 0, 10)));
+        $data[$date] = '';
 
-       echo json_encode(true);
-   }
+        return parent::create(self::_TABLE, $data);
+
+    }
+
+    public function deleteItem($id)
+    {
+        return parent::delete(self::_TABLE, $id);
+
+    }
+
 }

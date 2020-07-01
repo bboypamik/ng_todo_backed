@@ -1,64 +1,46 @@
 <?php
 
-include_once 'db.inc.php';
+
+include_once 'Crud.php';
 
 
-class User{
+class User extends Crud
+{
 
-    private $db;
+    const _TABLE = 'users';
 
-    public function __construct($db_conn)
+    public function __construct()
     {
-        $this->db = $db_conn;
+        parent::__construct();
+
     }
 
-    public function register($user_name, $user_password){
-        try {
+    public function createNewUser($data)
+    {
 
-            $sql = "INSERT INTO users(username, password) VALUES (:user_name, :user_password)";
+        return parent::create(self::_TABLE, $data);
 
-            $query = $this->db->prepare($sql);
 
-            $query->bindParam(":user_name", $user_name);
-            $query->bindParam(":user_password", $user_password);
-
-            $query->execute();
-
-        } catch (PDOException $e) {
-            array_push($errors, $e->getMessage());
-        }
     }
 
-    public function login($user_name, $user_password) {
-        try {
-            $sql = "SELECT * FROM users WHERE username = :user_name AND password = :user_password LIMIT 1";
+    public function login($data)
+    {
 
-            $query = $this->db->prepare($sql);
-
-
-
-            $query->bindParam(":user_name", $user_name);
-            $query->bindParam(":user_password", $user_password);
-
-            $query->execute();
-
-            $data = $query->fetch(PDO::FETCH_ASSOC);
+        $username = $data['username'];
+        $password = $data['password'];
 
 
-            if($query->rowCount() > 0){
+        $query = parent::read("*", self::_TABLE, " username = '" . $username . "' AND password= '" . $password . "'");
 
-               return json_encode($data);
+        $login = array_shift($query);
 
+        if ($login == null) {
+            return false;
 
-            }else{
-                return json_encode(false);
-            }
-        }catch (PDOException $e) {
-            array_push($errors, $e->getMessage());
+        } else {
+            return $login;
         }
-}
-
-
+    }
 }
 
 

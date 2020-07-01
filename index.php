@@ -1,68 +1,54 @@
 <?php
+
 header("Access-Control-Allow-Origin:*");
 header("Access-Control-Allow-Methods:*");
 header("Access-Control-Allow-Headers:*");
 header("Access-Control-Max-Age: 600");
 
-include_once 'includes/db.inc.php';
 
-$user = new User($db_conn);
-$todo = new Todo($db_conn);
+include_once 'includes/Todo.php';
+include_once 'includes/User.php';
+
+
+$todo = new Todo();
+$user = new User();
+
 
 if (isset($_SERVER['REQUEST_URI'])) {
     $params = explode("/", ltrim($_SERVER['REQUEST_URI'], "/"));
 
 }
 
-switch ($params[0]){
+switch ($params[0]) {
     case 'login':
 
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if(!$data){
-            return false;
-        }
-        $username = $data['username'];
-        $password = $data['password'];
-
-        echo  $user->login($username, $password);
+        echo json_encode($user->login($_POST));
 
         break;
 
     case 'register':
 
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if(!$data){
-            return false;
-        }
-        $username = $data['username'];
-        $password = $data['password'];
-
-        $user->register($username, $password);
+        echo json_encode($user->createNewUser($_POST));
 
         break;
 
     case 'add-new-item':
 
-        $item = $_POST['item'];
-        $user_id = $_POST['userId'];
-        $date = date("Y-m-d", strtotime(substr($_POST['date_time'], 0, 10)));
-
-        $todo->add((int)$user_id, $item, $date);
+        echo json_encode($todo->addNewItem($_POST));
 
         break;
 
     case 'get-todos':
 
-        $id = $params[1];
-
-        $todo->get((int)$id);
+        echo json_encode($todo->getAll($params[1]));
 
         break;
 
     case 'delete':
 
-        $id =  $params[1];
-        $todo->delete($id);
+        $id = $params[1];
+
+        echo json_encode($todo->deleteItem($id));
 }
+
+
